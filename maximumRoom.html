@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<canvas id="imgCanvas" width="700" height="700" style="border:1px solid #d3d3d3;"></canvas>
+	<img src="test.png" id="image">
+
+	<script>
+	var ctx = document.getElementById("imgCanvas").getContext("2d");
+	var img = document.getElementById("image");
+
+
+	function drawImage() {
+		ctx.drawImage(img, 10, 10);
+	}
+
+	function copy() {
+	  var imgData = ctx.getImageData(10, 10, img.width, img.height);
+	  document.getElementById("test").innerHTML=imgData.data
+	}
+	</script>
+
+	<button onclick="copy()">Copy</button>
+	<button onclick="drawImage()">img</button>
+	<span id="test">
+
+</body>
+</html>
