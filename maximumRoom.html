@@ -12,6 +12,7 @@
 	<script>
 	var ctx = document.getElementById("imgCanvas").getContext("2d");
 	var img = document.getElementById("image");
+	var motionCounter=1
 
 	rValue=[]
 	dataSet=[]
@@ -50,55 +51,110 @@
 	}
 
 	velocityX=[]
+	velocityMemX=[]
 	velocityY=[]
+	velocityMemY=[]
 	coordX=[]
 	coordY=[]
-	velocityX[0]=Math.random()/5
-	velocityY[0]=Math.random()/5
+	velocityX[0]=Math.random()/2.5-0.2
+	velocityMemX[0]=0;
+	velocityY[0]=Math.random()/2.5-0.2
+	velocityMemY[0]=0;
 	coordX[0]=img.width/2
 	coordY[0]=img.height/2
 	radius=10
+
 	function start() {
+		if (motionCounter=1) {
+		//redraw canvas
 		ctx.clearRect(10,img.height+100,img.width,img.height)
 		for (i=0; i<dataSet.length; i++) {
 			ctx.fillRect(dataSet[i][0]+10,dataSet[i][1]+img.height+100,1,1)
 		}
-		for (i=0; i<dataSet.length; i++) {
-			if (Math.pow(coordX[0]-dataSet[i][0],2)+Math.pow(coordY[0]-dataSet[i][1],2)>Math.pow(radius,2)) {
-			} else {
-				//search if any duplicates come out and then decide
-				counter=[dataSet[i][2]]
-				for (j=i+1; j<dataSet.length; j++) {
-					if (dataSet[i][0]==dataSet[j][0] && dataSet[i][1]==dataSet[j][1]) {
-						counter[counter.length]=dataSet[j][2]
+
+		fillingCounter=0
+		for (k=0; k<coordX.length; k++) {
+
+			for (i=0; i<dataSet.length; i++) {
+				if (Math.pow(coordX[k]-dataSet[i][0],2)+Math.pow(coordY[k]-dataSet[i][1],2)>Math.pow(radius,2)) {
+				} else {
+					//search if any duplicates come out and then decide
+					counter=[dataSet[i][2]]
+					for (j=i+1; j<dataSet.length; j++) {
+						if (dataSet[i][0]==dataSet[j][0] && dataSet[i][1]==dataSet[j][1]) {
+							counter[counter.length]=dataSet[j][2]
+						}
+					}
+					//decision
+					for (j=0; j<counter.length; j++) {
+						if (counter[j]==1) {
+							velocityX[k]=velocityX[k]*(-0.9-Math.random()/5)
+						}
+						if (counter[j]==2) {
+							velocityX[k]=velocityX[k]*(-0.9-Math.random()/5)
+						}
+						if (counter[j]==3) {
+							velocityY[k]=velocityY[k]*(-0.9-Math.random()/5)
+						}
+						if (counter[j]==4) {
+							velocityY[k]=velocityY[k]*(-0.9-Math.random()/5)
+						}
+					}
+					break	
+				}
+			} 
+		}
+		for (k=0; k<coordX.length; k++) {
+			for (i=0; i<coordX.length; i++) {
+				if (k!=i) {
+					if (Math.pow(coordX[k]-coordX[i],2)+Math.pow(coordY[k]-coordY[i],2)<Math.pow(2*radius,2)) {
+						velocityMemX[k]=velocityX[i]
+						// velocityMemX[i]=velocityX[k]
+						velocityMemY[k]=velocityY[i]
+						// velocityMemY[i]=velocityY[k]
 					}
 				}
-				//decision
-				for (j=0; j<counter.length; j++) {
-					if (counter[j]==1) {
-						velocityX[0]=velocityX[0]*(-0.9-Math.random()/5)
-					}
-					if (counter[j]==2) {
-						velocityX[0]=velocityX[0]*(-0.9-Math.random()/5)
-					}
-					if (counter[j]==3) {
-						velocityY[0]=velocityY[0]*(-0.9-Math.random()/5)
-					}
-					if (counter[j]==4) {
-						velocityY[0]=velocityY[0]*(-0.9-Math.random()/5)
-					}
-				}
-				break	
 			}
-		} 
-		coordX[0]+=velocityX[0]
-		coordY[0]+=velocityY[0]
-		ctx.beginPath()
-		ctx.arc(coordX[0]+10,coordY[0]+img.height+100,10,0,Math.PI*2)
-		ctx.stroke()
-		document.getElementById("test").value=velocityX[0];
-		document.getElementById("test").innerHTML=velocityY[0];
+		}
+
+		for (k=0; k<coordX.length; k++) {
+			for (i=0; i<velocityMemX.length; i++) {
+				if (velocityMemX[i]!=0 && velocityMemY[i]!=0) {
+					velocityX[i]=velocityMemX[i]
+					velocityY[i]=velocityMemY[i]
+					velocityMemX[i]=0
+					velocityMemY[i]=0
+				}
+			}
+			coordX[k]+=velocityX[k]
+			coordY[k]+=velocityY[k]
+
+			//set so if all coords are away
+			if (Math.pow(coordX[k]-img.width/2,2)+Math.pow(coordY[k]-img.height/2,2)>Math.pow(2*radius,2)) {
+				fillingCounter++;
+			}
+		}
+
+		if (fillingCounter==coordX.length) {
+			coordX[coordX.length]=img.width/2
+			coordY[coordY.length]=img.height/2
+			velocityX[velocityX.length]=Math.random()/2.5-0.2
+			velocityMemX[velocityMemX.length]=0
+			velocityY[velocityY.length]=Math.random()/2.5-0.2
+			velocityMemY[velocityMemY.length]=0
+		}
+
+		for (i=0; i<coordX.length; i++) {
+			ctx.beginPath()
+			ctx.arc(coordX[i]+10,coordY[i]+img.height+100,10,0,Math.PI*2)
+			ctx.stroke()
+		}
+		
+		document.getElementById("test1").innerHTML=velocityMemX;
+		// document.getElementById("test2").innerHTML=
 		window.setTimeout(start,5)
+
+		}
 	}
 
 
@@ -106,9 +162,9 @@
 
 	<button onclick="copy()">Copy</button>
 	<button onclick="start()">Start</button>
-	<span id="test">
-	<span id="tester">
-	<span id="test12">
+	<span id="test"></span>
+	<span id="test1">NaN</span>
+	<span id="test2"></span>
 
 </body>
 </html>
