@@ -74,7 +74,6 @@
 
 		fillingCounter=0
 		for (k=0; k<coordX.length; k++) {
-
 			for (i=0; i<dataSet.length; i++) {
 				if (Math.pow(coordX[k]-dataSet[i][0],2)+Math.pow(coordY[k]-dataSet[i][1],2)>Math.pow(radius,2)) {
 				} else {
@@ -144,6 +143,25 @@
 			velocityMemY[velocityMemY.length]=0
 		}
 
+		for (k=0; k<coordX.length; k++) {
+			for (i=0; i<coordX.length; i++) {
+				if (k!=i) {
+					if (Math.pow(coordX[k]-coordX[i],2)+Math.pow(coordY[k]-coordY[i],2)<Math.pow(1.9*radius,2)) {
+						coordX[i]=6000
+						coordY[i]=6000
+					}
+				}
+			}
+			for (i=0; i<dataSet.length; i++) {
+				if (k!=i) {
+				 	if (Math.pow(coordX[k]-dataSet[i][0],2)+Math.pow(coordY[k]-dataSet[i][1],2)<Math.pow(0.9*radius,2)) {
+				 		coordX[k]=6000
+				 		coordY[k]=6000
+					}
+				}
+			}
+		}
+
 		for (i=0; i<coordX.length; i++) {
 			ctx.beginPath()
 			ctx.arc(coordX[i]+10,coordY[i]+img.height+100,10,0,Math.PI*2)
@@ -168,3 +186,4 @@
 
 </body>
 </html>
+
